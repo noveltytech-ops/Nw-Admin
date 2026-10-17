@@ -1,0 +1,8 @@
+{
+  "/api/leave/[id]/approve/route": "app/api/leave/[id]/approve/route.js",
+  "/(portal)/organization/page": "app/(portal)/organization/page.js",
+  "/(portal)/approvals/page": "app/(portal)/approvals/page.js",
+  "/(portal)/my-requests/page": "app/(portal)/my-requests/page.js",
+  "/(portal)/apply/page": "app/(portal)/apply/page.js",
+  "/(portal)/dashboard/page": "app/(portal)/dashboard/page.js"
+}
