@@ -1,12 +1,3 @@
-import {
-  SEED_EMPLOYEES,
-  SEED_HOLIDAYS,
-  SEED_LEAVE_POLICY,
-  SEED_LEAVE_REQUESTS,
-  SEED_LEAVE_TYPES,
-  SEED_POLICY,
-  SEED_WFH_REQUESTS,
-} from '@/data/seed-data';
 import type { AppState } from '@/services/storage.service';
 import { DATA_VERSION } from '@/services/storage.service';
 import type {
@@ -24,6 +15,24 @@ import type {
 import { createServiceClient } from './db';
 
 type Supa = ReturnType<typeof createServiceClient>;
+
+// ---------- fallback defaults (used only when Supabase singleton rows are missing) ----------
+const DEFAULT_WORK_POLICY: WorkPolicy = {
+  workMode: { 0: 'off', 1: 'office', 2: 'wfh', 3: 'office', 4: 'office', 5: 'wfh', 6: 'off' },
+  effectiveFrom: '2026-01-01',
+  updatedAt: new Date(0).toISOString(),
+  updatedBy: '',
+};
+
+const DEFAULT_LEAVE_POLICY: LeavePolicy = {
+  leaveYearStartMonth: 1,
+  maxCarryForward: 5,
+  excessCarryForwardTreatment: 'encash-at-basic-pay',
+  qEndNegativeAllowance: 3,
+  q4NegativeTreatment: 'loss-of-pay',
+  halfDayRequiresManagerApproval: true,
+  retrospectiveLeaveTreatment: 'loss-of-pay',
+};
 
 // ---------- row ↔ model mappers ----------
 const toEmployee = (r: any): Employee => ({
@@ -200,9 +209,7 @@ const auditRow = (a: AuditEvent) => ({
 
 // ---------- helpers ----------
 async function orThrow<T>(res: { data: T; error: any }, label: string): Promise<T> {
-  if (res.error) {
-    throw new Error(`[supabase:${label}] ${res.error.message || res.error}`);
-  }
+  if (res.error) throw new Error(`[supabase:${label}] ${res.error.message || res.error}`);
   return res.data;
 }
 
@@ -262,40 +269,26 @@ export async function loadState(): Promise<AppState> {
     return emp;
   });
 
-  const state: AppState = {
+  return {
     version: DATA_VERSION,
     employees,
     leaveTypes: (typeRows ?? []).map(toLeaveType),
     leaveRequests: (lrRows ?? []).map(toLeaveRequest),
     wfhRequests: (wfhRows ?? []).map(toWFHRequest),
     holidays: (holRows ?? []).map(toHoliday),
-    policy: workRow ? toWorkPolicy(workRow) : SEED_POLICY,
-    leavePolicy: lpRow ? toLeavePolicy(lpRow) : SEED_LEAVE_POLICY,
+    policy: workRow ? toWorkPolicy(workRow) : DEFAULT_WORK_POLICY,
+    leavePolicy: lpRow ? toLeavePolicy(lpRow) : DEFAULT_LEAVE_POLICY,
     audit: (auditRows ?? []).map(toAudit),
   };
-
-  // Autoseed if the DB is empty (no employees means fresh database).
-  if (state.employees.length === 0 && state.leaveTypes.length === 0) {
-    console.warn('[server/state] empty database, running autoseed');
-    const seed = buildSeedState();
-    await saveState(seed);
-    return seed;
-  }
-
-  return state;
 }
 
 // ---------- save full state ----------
 export async function saveState(state: AppState): Promise<void> {
   const supa = createServiceClient();
 
-  // Employees first (FK targets).
   await syncArrayById(supa, 'employees', state.employees.map(employeeRow));
-
-  // Leave types (also FK target for balances & requests).
   await syncArrayById(supa, 'leave_types', state.leaveTypes.map(leaveTypeRow));
 
-  // Balances — composite key (employee_id, leave_type_id).
   const balanceRows = state.employees.flatMap((e) =>
     e.balances.map((b) => ({
       employee_id: e.id,
@@ -311,53 +304,41 @@ export async function saveState(state: AppState): Promise<void> {
     if (error) throw new Error(`[supabase:leave_balances.upsert] ${error.message}`);
   }
 
-  // Transactional rows.
   await Promise.all([
     syncArrayById(supa, 'leave_requests', state.leaveRequests.map(leaveRequestRow)),
     syncArrayById(supa, 'wfh_requests', state.wfhRequests.map(wfhRequestRow)),
     syncArrayById(supa, 'holidays', state.holidays.map(holidayRow)),
   ]);
 
-  // Singletons.
   const { error: wpErr } = await supa.from('work_policy').upsert(workPolicyRow(state.policy));
   if (wpErr) throw new Error(`[supabase:work_policy.upsert] ${wpErr.message}`);
   const { error: lpErr } = await supa.from('leave_policy').upsert(leavePolicyRow(state.leavePolicy));
   if (lpErr) throw new Error(`[supabase:leave_policy.upsert] ${lpErr.message}`);
 
-  // Audit events are append-only — upsert without delete-sync.
   if (state.audit.length) {
     const { error } = await supa.from('audit_events').upsert(state.audit.map(auditRow));
     if (error) throw new Error(`[supabase:audit_events.upsert] ${error.message}`);
   }
 }
 
-// ---------- reset ----------
-function buildSeedState(): AppState {
-  return JSON.parse(
-    JSON.stringify({
-      version: DATA_VERSION,
-      employees: SEED_EMPLOYEES,
-      leaveTypes: SEED_LEAVE_TYPES,
-      leaveRequests: SEED_LEAVE_REQUESTS,
-      wfhRequests: SEED_WFH_REQUESTS,
-      holidays: SEED_HOLIDAYS,
-      policy: SEED_POLICY,
-      leavePolicy: SEED_LEAVE_POLICY,
-      audit: [],
-    }),
-  );
-}
-
+// ---------- reset demo data: wipe transactional rows + zero balances ----------
 export async function resetState(): Promise<AppState> {
-  const seed = buildSeedState();
-  // Wipe transactional + policy history first so stale FK refs don't block us.
   const supa = createServiceClient();
-  await supa.from('audit_events').delete().neq('id', '');
-  await supa.from('leave_requests').delete().neq('id', '');
-  await supa.from('wfh_requests').delete().neq('id', '');
-  // Then full save (which syncs employees, types, holidays, balances, policies).
-  await saveState(seed);
-  return seed;
+
+  const [{ error: auditErr }, { error: lrErr }, { error: wfhErr }] = await Promise.all([
+    supa.from('audit_events').delete().neq('id', ''),
+    supa.from('leave_requests').delete().neq('id', ''),
+    supa.from('wfh_requests').delete().neq('id', ''),
+  ]);
+  if (auditErr) throw new Error(`[supabase:audit_events.delete] ${auditErr.message}`);
+  if (lrErr) throw new Error(`[supabase:leave_requests.delete] ${lrErr.message}`);
+  if (wfhErr) throw new Error(`[supabase:wfh_requests.delete] ${wfhErr.message}`);
+
+  // Zero out used balances so quotas go back to full.
+  const { error: balErr } = await supa.from('leave_balances').update({ used: 0 }).neq('id', 0);
+  if (balErr) throw new Error(`[supabase:leave_balances.update] ${balErr.message}`);
+
+  return loadState();
 }
 
 // ---------- generic mutation runner (keeps the service-function pattern intact) ----------

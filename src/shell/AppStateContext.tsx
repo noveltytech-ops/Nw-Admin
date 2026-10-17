@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import type { Employee } from '@/types';
-import { DEMO_PERSONAS, personaStorage, type AppState } from '@/services/storage.service';
+import { pickDefaultPersonaId, personaStorage, type AppState } from '@/services/storage.service';
 import { apiClient } from '@/services/api-client';
 
 interface ToastMsg {
@@ -58,12 +58,6 @@ interface AppStateContextValue {
 
 const AppStateContext = createContext<AppStateContextValue | undefined>(undefined);
 
-function defaultPersonaId(state: AppState): string {
-  const stored = personaStorage.load();
-  if (stored && state.employees.some((e) => e.id === stored)) return stored;
-  return DEMO_PERSONAS[0].id;
-}
-
 interface AppStateProviderProps {
   initialState: AppState;
   children: ReactNode;
@@ -71,7 +65,9 @@ interface AppStateProviderProps {
 
 export function AppStateProvider({ initialState, children }: AppStateProviderProps) {
   const [state, setState] = useState<AppState>(initialState);
-  const [currentPersonaId, setCurrentPersonaIdRaw] = useState<string>(() => defaultPersonaId(initialState));
+  const [currentPersonaId, setCurrentPersonaIdRaw] = useState<string>(
+    () => pickDefaultPersonaId(initialState.employees) ?? '',
+  );
   const [busy, setBusy] = useState(false);
   const [toasts, setToasts] = useState<ToastMsg[]>([]);
   const toastSeq = useRef(0);

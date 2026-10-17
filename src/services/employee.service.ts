@@ -1,6 +1,5 @@
-import type { Employee, LeaveBalance } from '@/types';
+import type { Employee, LeaveBalance, LeaveTypeConfig } from '@/types';
 import type { AppState } from './storage.service';
-import { SEED_LEAVE_TYPES } from '@/data/seed-data';
 
 export const employeeService = {
   byId(state: AppState, id: string): Employee | undefined {
@@ -25,8 +24,8 @@ export const employeeService = {
       (e) => e.active && e.managerId === emp.managerId && e.id !== emp.id,
     );
   },
-  defaultBalance(): LeaveBalance[] {
-    return SEED_LEAVE_TYPES.map((lt) => ({
+  defaultBalance(leaveTypes: LeaveTypeConfig[]): LeaveBalance[] {
+    return leaveTypes.map((lt) => ({
       leaveTypeId: lt.id,
       allocated: lt.defaultAnnualQuota,
       used: 0,

@@ -5,7 +5,6 @@ import type {
   LeavePolicy,
   LeaveRequest,
   LeaveTypeConfig,
-  Role,
   WFHRequest,
   WorkPolicy,
 } from '@/types';
@@ -36,8 +35,18 @@ export const personaStorage = {
   },
 };
 
-export const DEMO_PERSONAS: { id: string; role: Role }[] = [
-  { id: 'emp_tharun', role: 'employee' },
-  { id: 'emp_sajal', role: 'manager' },
-  { id: 'emp_admin', role: 'admin' },
-];
+/**
+ * Pick a sensible default persona from whatever employees are loaded.
+ * Preference: previously-selected (if still active) → first active employee →
+ * first active manager → first active admin → first employee → undefined.
+ */
+export function pickDefaultPersonaId(employees: Employee[]): string | undefined {
+  const stored = personaStorage.load();
+  if (stored && employees.some((e) => e.id === stored && e.active)) return stored;
+  const roles: Array<Employee['role']> = ['employee', 'manager', 'admin'];
+  for (const role of roles) {
+    const match = employees.find((e) => e.active && e.role === role);
+    if (match) return match.id;
+  }
+  return employees[0]?.id;
+}

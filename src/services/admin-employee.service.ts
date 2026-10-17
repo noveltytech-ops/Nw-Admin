@@ -8,7 +8,7 @@ export const adminEmployeeService = {
     const emp: Employee = {
       ...input,
       id: genId('emp'),
-      balances: employeeService.defaultBalance(),
+      balances: employeeService.defaultBalance(state.leaveTypes),
     };
     const next: AppState = {
       ...state,
