@@ -43,7 +43,7 @@ export const personaStorage = {
 export function pickDefaultPersonaId(employees: Employee[]): string | undefined {
   const stored = personaStorage.load();
   if (stored && employees.some((e) => e.id === stored && e.active)) return stored;
-  const roles: Array<Employee['role']> = ['employee', 'manager', 'admin'];
+  const roles: Array<Employee['role']> = ['employee', 'lead', 'manager', 'admin'];
   for (const role of roles) {
     const match = employees.find((e) => e.active && e.role === role);
     if (match) return match.id;

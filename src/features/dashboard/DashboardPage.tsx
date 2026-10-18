@@ -16,7 +16,7 @@ export function DashboardPage() {
       />
       {currentUser.role === 'admin' ? (
         <AdminDashboard />
-      ) : currentUser.role === 'manager' ? (
+      ) : currentUser.role === 'manager' || currentUser.role === 'lead' ? (
         <ManagerDashboard />
       ) : (
         <EmployeeDashboard />

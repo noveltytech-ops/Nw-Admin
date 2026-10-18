@@ -60,7 +60,7 @@ export function WFHPage() {
   const teamScope =
     currentUser.role === 'admin'
       ? state.employees.filter((e) => e.active)
-      : currentUser.role === 'manager'
+      : currentUser.role === 'manager' || currentUser.role === 'lead'
         ? employeeService.reports(state, currentUser.id)
         : [currentUser, ...employeeService.team(state, currentUser.id)];
 

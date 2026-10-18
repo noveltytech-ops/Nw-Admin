@@ -12,6 +12,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { employeeService } from '@/services/employee.service';
 import { formatHuman } from '@/utils/date';
+import { ROLE_BADGE_TONE, ROLE_LABEL } from '@/utils/role';
 import type { Employee, Role } from '@/types';
 
 const AVATAR_COLORS = ['#2f5df0', '#9333ea', '#0f766e', '#ea580c', '#db2777', '#2563eb', '#0ea5e9', '#be123c', '#f59e0b', '#4338ca'];
@@ -114,7 +115,7 @@ export function OrganizationPage() {
                       {manager ? <> · reports to {manager.firstName} {manager.lastName}</> : ' · no manager'}
                     </p>
                   </div>
-                  <Badge tone={emp.role === 'admin' ? 'brand' : emp.role === 'manager' ? 'violet' : 'neutral'}>{emp.role}</Badge>
+                  <Badge tone={ROLE_BADGE_TONE[emp.role]}>{ROLE_LABEL[emp.role]}</Badge>
                 </button>
               );
             })
@@ -167,7 +168,7 @@ function EmployeeProfile({ employee, onEdit, onDeactivate }: { employee: Employe
             <p className="text-sm text-slate-500">{employee.designation}</p>
           </div>
         </div>
-        <Badge tone={employee.role === 'admin' ? 'brand' : employee.role === 'manager' ? 'violet' : 'neutral'}>{employee.role}</Badge>
+        <Badge tone={ROLE_BADGE_TONE[employee.role]}>{ROLE_LABEL[employee.role]}</Badge>
       </CardHeader>
       <CardBody className="space-y-3 text-sm">
         <dl className="grid grid-cols-3 gap-y-2">
@@ -359,6 +360,7 @@ function EmployeeFormDialog({ open, onClose, existing }: { open: boolean; onClos
           <Label>Role</Label>
           <Select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as Role })}>
             <option value="employee">Employee</option>
+            <option value="lead">Team Lead</option>
             <option value="manager">Manager</option>
             <option value="admin">Admin</option>
           </Select>

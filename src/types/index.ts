@@ -1,4 +1,4 @@
-export type Role = 'employee' | 'manager' | 'admin';
+export type Role = 'employee' | 'lead' | 'manager' | 'admin';
 
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0 = Sunday
 

@@ -63,7 +63,9 @@ export function OnboardPage() {
   const managerOptions = useMemo(() => {
     if (!isAdmin) return [];
     return state.employees
-      .filter((e) => e.active && (e.role === 'manager' || e.role === 'admin'))
+      .filter(
+        (e) => e.active && (e.role === 'lead' || e.role === 'manager' || e.role === 'admin'),
+      )
       .sort((a, b) => a.firstName.localeCompare(b.firstName));
   }, [state.employees, isAdmin]);
 
@@ -281,6 +283,7 @@ export function OnboardPage() {
                   <Label>Role</Label>
                   <Select value={form.role} onChange={(e) => update('role', e.target.value as Role)}>
                     <option value="employee">Employee</option>
+                    <option value="lead">Team Lead</option>
                     <option value="manager">Manager</option>
                     <option value="admin">Admin</option>
                   </Select>

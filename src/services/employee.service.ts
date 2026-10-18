@@ -13,7 +13,7 @@ export const employeeService = {
   },
   managers(state: AppState): Employee[] {
     return state.employees.filter(
-      (e) => e.active && (e.role === 'manager' || e.role === 'admin'),
+      (e) => e.active && (e.role === 'lead' || e.role === 'manager' || e.role === 'admin'),
     );
   },
   team(state: AppState, employeeId: string): Employee[] {

@@ -5,12 +5,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { signOut, useCurrentEmployee } from '@/stores/auth.context';
 import { cn } from '@/utils/cn';
-
-const ROLE_LABEL: Record<string, string> = {
-  employee: 'Employee',
-  manager: 'Manager',
-  admin: 'Admin',
-};
+import { ROLE_BADGE_TONE, ROLE_LABEL } from '@/utils/role';
 
 export function UserMenu() {
   const emp = useCurrentEmployee();
@@ -52,9 +47,7 @@ export function UserMenu() {
               <p className="truncate text-sm font-medium text-slate-900">{name}</p>
               <p className="truncate text-xs text-slate-500">{emp.email}</p>
             </div>
-            <Badge tone={emp.role === 'admin' ? 'brand' : emp.role === 'manager' ? 'violet' : 'neutral'}>
-              {ROLE_LABEL[emp.role]}
-            </Badge>
+            <Badge tone={ROLE_BADGE_TONE[emp.role]}>{ROLE_LABEL[emp.role]}</Badge>
           </div>
           <div className="px-1 py-1">
             <button

@@ -3,7 +3,7 @@ import { RoleGuard } from '@/shell/RoleGuard';
 
 export default function Page() {
   return (
-    <RoleGuard roles={['manager', 'admin']}>
+    <RoleGuard roles={['lead', 'manager', 'admin']}>
       <OnboardPage />
     </RoleGuard>
   );

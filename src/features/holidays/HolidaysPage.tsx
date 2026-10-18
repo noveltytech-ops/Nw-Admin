@@ -74,10 +74,6 @@ export function HolidaysPage() {
         actions={isAdmin ? <Button size="sm" onClick={openCreate}><Plus className="h-3.5 w-3.5" /> Add holiday</Button> : null}
       />
 
-      <p className="mb-4 rounded border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-        These seed holidays are illustrative, not an authoritative list. Admins should curate this calendar for the real company.
-      </p>
-
       <div className="grid gap-4 lg:grid-cols-2">
         <HolidayList title="Upcoming" items={upcoming} isAdmin={isAdmin} onEdit={openEdit} onDelete={remove} />
         <HolidayList title="Past" items={past} isAdmin={isAdmin} onEdit={openEdit} onDelete={remove} />
