@@ -1,10 +1,11 @@
 'use client';
 import { AlertCircle, CheckCircle2, Info, X } from 'lucide-react';
-import { useAppState } from '@/shell/AppStateContext';
+import { useAppStore } from '@/stores/app.store';
 import { cn } from '@/utils/cn';
 
 export function ToastRack() {
-  const { toasts, dismissToast } = useAppState();
+  const toasts = useAppStore((s) => s.toasts);
+  const dismissToast = useAppStore((s) => s.dismissToast);
   return (
     <div className="pointer-events-none fixed bottom-4 right-4 z-[60] flex w-80 flex-col gap-2">
       {toasts.map((t) => (
