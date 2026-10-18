@@ -2,7 +2,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Clock, Inbox, Trash2, XCircle } from 'lucide-react';
-import { useAppState } from '@/shell/AppStateContext';
+import { useApp } from '@/shell/useApp';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -25,7 +25,7 @@ const STATUS_TABS: { value: RequestStatus | 'all'; label: string }[] = [
 ];
 
 export function MyRequestsPage() {
-  const { state, currentUser, api, pushToast } = useAppState();
+  const { state, currentUser, api, pushToast } = useApp();
   const [tab, setTab] = useState<RequestStatus | 'all'>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [from, setFrom] = useState('');

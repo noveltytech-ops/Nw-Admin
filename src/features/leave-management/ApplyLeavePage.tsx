@@ -2,7 +2,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CalendarCheck, Info } from 'lucide-react';
-import { useAppState } from '@/shell/AppStateContext';
+import { useApp } from '@/shell/useApp';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { FieldError, FieldHint, Input, Label, Select, Textarea } from '@/components/ui/Input';
@@ -13,7 +13,7 @@ import { computeWorkingDays } from '@/services/working-days.service';
 import { todayISO } from '@/utils/date';
 
 export function ApplyLeavePage() {
-  const { state, currentUser, api, pushToast, busy } = useAppState();
+  const { state, currentUser, api, pushToast, busy } = useApp();
   const router = useRouter();
 
   const [input, setInput] = useState<LeaveApplicationInput>({
@@ -275,7 +275,7 @@ export function ApplyLeavePage() {
 }
 
 function ApproverInfo() {
-  const { state, currentUser } = useAppState();
+  const { state, currentUser } = useApp();
   const manager = state.employees.find((e) => e.id === currentUser.managerId);
   if (!manager) {
     return (

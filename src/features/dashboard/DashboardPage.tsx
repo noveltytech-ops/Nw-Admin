@@ -1,5 +1,5 @@
 'use client';
-import { useAppState } from '@/shell/AppStateContext';
+import { useApp } from '@/shell/useApp';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { EmployeeDashboard } from './EmployeeDashboard';
 import { ManagerDashboard } from './ManagerDashboard';
@@ -7,7 +7,7 @@ import { AdminDashboard } from './AdminDashboard';
 import { formatRelativeOrDate, todayISO } from '@/utils/date';
 
 export function DashboardPage() {
-  const { currentUser } = useAppState();
+  const { currentUser } = useApp();
   return (
     <>
       <PageHeader

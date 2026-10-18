@@ -1,7 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { Edit3, PartyPopper, Plus, Trash2 } from 'lucide-react';
-import { useAppState } from '@/shell/AppStateContext';
+import { useApp } from '@/shell/useApp';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -13,7 +13,7 @@ import { formatHuman, todayISO } from '@/utils/date';
 import type { Holiday } from '@/types';
 
 export function HolidaysPage() {
-  const { state, currentUser, api, pushToast, busy } = useAppState();
+  const { state, currentUser, api, pushToast, busy } = useApp();
   const isAdmin = currentUser.role === 'admin';
 
   const [editor, setEditor] = useState<Holiday | 'new' | null>(null);

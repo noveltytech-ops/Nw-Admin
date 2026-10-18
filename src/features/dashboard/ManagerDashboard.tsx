@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { CalendarRange, ClipboardList, Home, Users } from 'lucide-react';
-import { useAppState } from '@/shell/AppStateContext';
+import { useApp } from '@/shell/useApp';
 import { Stat } from '@/components/ui/Stat';
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -14,7 +14,7 @@ import { resolveDailyWorkMode } from '@/services/wfh.service';
 import { addDaysISO, formatHuman, todayISO } from '@/utils/date';
 
 export function ManagerDashboard() {
-  const { state, currentUser } = useAppState();
+  const { state, currentUser } = useApp();
   const reports = employeeService.reports(state, currentUser.id).filter((e) => e.active);
   const reportIds = new Set(reports.map((r) => r.id));
 

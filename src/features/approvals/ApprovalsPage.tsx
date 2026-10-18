@@ -1,7 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { Check, Inbox, ShieldAlert, X } from 'lucide-react';
-import { useAppState } from '@/shell/AppStateContext';
+import { useApp } from '@/shell/useApp';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -20,7 +20,7 @@ import type { LeaveRequest, WFHRequest } from '@/types';
 type Decision = { kind: 'approve' | 'reject'; type: 'leave' | 'wfh'; id: string };
 
 export function ApprovalsPage() {
-  const { state, currentUser, api, pushToast, busy } = useAppState();
+  const { state, currentUser, api, pushToast, busy } = useApp();
   const [tab, setTab] = useState<'pending' | 'decided'>('pending');
   const [typeFilter, setTypeFilter] = useState<'all' | 'leave' | 'wfh'>('all');
   const [decision, setDecision] = useState<Decision | null>(null);
@@ -166,7 +166,7 @@ export function ApprovalsPage() {
 }
 
 function LeaveRow({ request, onDecision }: { request: LeaveRequest; onDecision: (k: 'approve' | 'reject') => void }) {
-  const { state, currentUser } = useAppState();
+  const { state, currentUser } = useApp();
   const emp = employeeService.byId(state, request.employeeId);
   const t = leaveTypeById(state.leaveTypes, request.leaveTypeId);
   if (!emp) return null;
@@ -215,7 +215,7 @@ function LeaveRow({ request, onDecision }: { request: LeaveRequest; onDecision: 
 }
 
 function WFHRow({ request, onDecision }: { request: WFHRequest; onDecision: (k: 'approve' | 'reject') => void }) {
-  const { state, currentUser } = useAppState();
+  const { state, currentUser } = useApp();
   const emp = employeeService.byId(state, request.employeeId);
   if (!emp) return null;
   const canAct = approvalService.canApproveWFH(state, currentUser.id, request) && request.status === 'pending';

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { AlertTriangle, Home, Users } from 'lucide-react';
-import { useAppState } from '@/shell/AppStateContext';
+import { useApp } from '@/shell/useApp';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -24,7 +24,7 @@ const DAYS: { v: Weekday; label: string }[] = [
 ];
 
 export function AdminSettingsPage() {
-  const { state, currentUser, api, pushToast } = useAppState();
+  const { state, currentUser, api, pushToast } = useApp();
   const [tab, setTab] = useState<'policy' | 'leave' | 'leavePolicy' | 'reporting' | 'danger'>('policy');
   const [confirmReset, setConfirmReset] = useState(false);
 
@@ -372,7 +372,7 @@ export function AdminSettingsPage() {
 }
 
 function LeavePolicyPanel() {
-  const { state, currentUser, api, pushToast } = useAppState();
+  const { state, currentUser, api, pushToast } = useApp();
   const lp = state.leavePolicy;
   const update = (patch: Partial<typeof lp>) => {
     void api.updateLeavePolicy(patch);

@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { CalendarRange, Home, PartyPopper, ShieldCheck, Users } from 'lucide-react';
-import { useAppState } from '@/shell/AppStateContext';
+import { useApp } from '@/shell/useApp';
 import { Stat } from '@/components/ui/Stat';
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -13,7 +13,7 @@ import { addDaysISO, datesForWeek, formatHuman, formatHumanShort, toISO, todayDa
 const DOW_LABEL = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export function AdminDashboard() {
-  const { state } = useAppState();
+  const { state } = useApp();
   const activeEmployees = state.employees.filter((e) => e.active);
 
   const onLeaveToday = activeEmployees.filter((e) => resolveDailyWorkMode(state, e.id, todayISO()) === 'leave').length;

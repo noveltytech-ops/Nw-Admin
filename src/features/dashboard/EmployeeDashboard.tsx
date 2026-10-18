@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { CalendarCheck, CalendarPlus, Clock, Home, PartyPopper, Users } from 'lucide-react';
-import { useAppState } from '@/shell/AppStateContext';
+import { useApp } from '@/shell/useApp';
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge, statusTone } from '@/components/ui/Badge';
@@ -13,7 +13,7 @@ import { resolveDailyWorkMode } from '@/services/wfh.service';
 import { addDaysISO, datesForWeek, formatHuman, formatHumanShort, toISO, todayDate, todayISO } from '@/utils/date';
 
 export function EmployeeDashboard() {
-  const { state, currentUser } = useAppState();
+  const { state, currentUser } = useApp();
 
   const myLeave = state.leaveRequests.filter((r) => r.employeeId === currentUser.id);
   const pending = myLeave.filter((r) => r.status === 'pending');

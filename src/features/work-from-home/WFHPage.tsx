@@ -1,7 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { CalendarDays, Home, Trash2, Users } from 'lucide-react';
-import { useAppState } from '@/shell/AppStateContext';
+import { useApp } from '@/shell/useApp';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { FieldError, FieldHint, Input, Label, Textarea } from '@/components/ui/Input';
@@ -18,7 +18,7 @@ import { cn } from '@/utils/cn';
 const DOW_LABEL = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export function WFHPage() {
-  const { state, currentUser, api, pushToast, busy } = useAppState();
+  const { state, currentUser, api, pushToast, busy } = useApp();
   const [tab, setTab] = useState<'my' | 'team'>('my');
   const [date, setDate] = useState<string>(addDaysISO(todayISO(), 1));
   const [reason, setReason] = useState('');
@@ -236,7 +236,7 @@ function WFHLegend() {
 }
 
 function TeamWeekGrid({ week, people }: { week: Date[]; people: { id: string; firstName: string; lastName: string; department: string; avatarColor: string; designation: string }[] }) {
-  const { state } = useAppState();
+  const { state } = useApp();
   return (
     <Card>
       <CardHeader>

@@ -1,7 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { CalendarRange, ChevronLeft, ChevronRight, FilterX, PartyPopper } from 'lucide-react';
-import { useAppState } from '@/shell/AppStateContext';
+import { useApp } from '@/shell/useApp';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -38,7 +38,7 @@ interface EventItem {
 }
 
 export function LeaveCalendarPage() {
-  const { state } = useAppState();
+  const { state } = useApp();
   const [view, setView] = useState<View>('month');
   const [cursor, setCursor] = useState<Date>(todayDate());
   const [employeeFilter, setEmployeeFilter] = useState<string>('all');
@@ -496,14 +496,14 @@ function HolidayDetails({ holiday }: { holiday: Holiday }) {
   );
 }
 
-function eventColor(ev: EventItem, types: ReturnType<typeof useAppState>['state']['leaveTypes']): string {
+function eventColor(ev: EventItem, types: LeaveTypeConfig[]): string {
   if (ev.type === 'holiday') return '#8b5cf6';
   if (!ev.leave) return '#64748b';
   const t = types.find((x) => x.id === ev.leave!.leaveTypeId);
   return t?.color ?? '#64748b';
 }
 
-function leaveCode(id: string, types: ReturnType<typeof useAppState>['state']['leaveTypes']): string {
+function leaveCode(id: string, types: LeaveTypeConfig[]): string {
   return types.find((t) => t.id === id)?.code ?? '—';
 }
 

@@ -1,7 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { Edit3, Plus, Search, UserMinus } from 'lucide-react';
-import { useAppState } from '@/shell/AppStateContext';
+import { useApp } from '@/shell/useApp';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -17,7 +17,7 @@ import type { Employee, Role } from '@/types';
 const AVATAR_COLORS = ['#2f5df0', '#9333ea', '#0f766e', '#ea580c', '#db2777', '#2563eb', '#0ea5e9', '#be123c', '#f59e0b', '#4338ca'];
 
 export function OrganizationPage() {
-  const { state, currentUser, api, pushToast } = useAppState();
+  const { state, currentUser, api, pushToast } = useApp();
   const [search, setSearch] = useState('');
   const [department, setDepartment] = useState<string>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -151,7 +151,7 @@ export function OrganizationPage() {
 }
 
 function EmployeeProfile({ employee, onEdit, onDeactivate }: { employee: Employee; onEdit: () => void; onDeactivate: () => void }) {
-  const { state, currentUser } = useAppState();
+  const { state, currentUser } = useApp();
   const manager = state.employees.find((e) => e.id === employee.managerId);
   const reports = employeeService.reports(state, employee.id);
   const isAdmin = currentUser.role === 'admin';
@@ -220,7 +220,7 @@ function EmployeeProfile({ employee, onEdit, onDeactivate }: { employee: Employe
 }
 
 function ReportingTree() {
-  const { state } = useAppState();
+  const { state } = useApp();
   const roots = state.employees.filter((e) => e.active && !e.managerId);
   return (
     <Card>
@@ -240,7 +240,7 @@ function ReportingTree() {
 }
 
 function TreeNode({ node, depth }: { node: Employee; depth: number }) {
-  const { state } = useAppState();
+  const { state } = useApp();
   const kids = employeeService.reports(state, node.id).filter((e) => e.active);
   return (
     <div style={{ paddingLeft: depth * 14 }}>
@@ -272,7 +272,7 @@ interface FormState {
 }
 
 function EmployeeFormDialog({ open, onClose, existing }: { open: boolean; onClose: () => void; existing: Employee | null }) {
-  const { state, currentUser, api, pushToast, busy } = useAppState();
+  const { state, currentUser, api, pushToast, busy } = useApp();
   const [form, setForm] = useState<FormState>(() => defaultForm(existing));
   const [cycleWarn, setCycleWarn] = useState('');
 
