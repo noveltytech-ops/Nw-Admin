@@ -8,6 +8,7 @@ import {
   Inbox,
   PartyPopper,
   Settings,
+  UserPlus,
   Users,
 } from 'lucide-react';
 import type { Role } from '@/types';
@@ -27,6 +28,7 @@ export const NAV_ITEMS: NavItem[] = [
   { path: '/approvals', label: 'Approval Inbox', icon: Gauge, roles: ['manager', 'admin'] },
   { path: '/wfh', label: 'Work From Home', icon: CalendarDays },
   { path: '/organization', label: 'Organization', icon: Users },
+  { path: '/onboard', label: 'Add Employee', icon: UserPlus, roles: ['manager', 'admin'] },
   { path: '/holidays', label: 'Company Holidays', icon: PartyPopper },
   { path: '/admin', label: 'Admin Settings', icon: Settings, roles: ['admin'] },
 ];

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, LogOut } from 'lucide-react';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
-import { useAuthStore } from '@/stores/auth.store';
+import { signOut, useCurrentEmployee } from '@/stores/auth.context';
 import { cn } from '@/utils/cn';
 
 const ROLE_LABEL: Record<string, string> = {
@@ -13,8 +13,7 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 export function UserMenu() {
-  const emp = useAuthStore((s) => s.currentEmployee);
-  const signOut = useAuthStore((s) => s.signOut);
+  const emp = useCurrentEmployee();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -27,8 +26,6 @@ export function UserMenu() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
-
-  if (!emp) return null;
 
   const name = `${emp.firstName}${emp.lastName ? ` ${emp.lastName}` : ''}`;
 

@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { AppShell } from '@/shell/AppShell';
-import { AppStoreHydrator } from '@/shell/AppStoreHydrator';
+import { ClientProviders } from '@/shell/ClientProviders';
 import { loadState } from '@/server/state';
 import { createClient } from '@/utils/supabase/server';
 
@@ -18,23 +18,17 @@ export default async function PortalLayout({ children }: { children: React.React
     redirect('/login');
   }
 
-  const initialState = await loadState();
   const authEmail = (user.email ?? '').toLowerCase();
-  const currentEmployee =
-    initialState.employees.find((e) => e.email.toLowerCase() === authEmail) ?? null;
+  const initialState = await loadState();
+  const match = initialState.employees.find((e) => e.email.toLowerCase() === authEmail);
 
-  if (!currentEmployee) {
-    // Signed-in Supabase user with no matching employee row — bounce them.
+  if (!match) {
     redirect('/login?error=no-employee-match');
   }
 
   return (
-    <AppStoreHydrator
-      initialState={initialState}
-      authEmail={authEmail}
-      currentEmployee={currentEmployee}
-    >
+    <ClientProviders initialState={initialState} authEmail={authEmail}>
       <AppShell>{children}</AppShell>
-    </AppStoreHydrator>
+    </ClientProviders>
   );
 }
